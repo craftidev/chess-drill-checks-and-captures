@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chess drill: checks &amp; captures</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/github.com/schaumb/domarrow.js/domarrow.css">
     <script src="/static/htmx.min.js"></script>
+    <script src="/static/github.com/schaumb/domarrow.js/domarrow.js"></script>
 </head>
 
 <body>
     <h1>Chess drill: checks &amp; captures</h1>
-    
+
     <div id="instruction">
         <p>Identify all possible checks and captures from the opponent.</p>
     </div>
@@ -18,11 +20,12 @@
     <div id="streak">
         <p>Current Streak: <span id="streak-counter">{{ streak }}</span></p>
     </div>
-    <div id="chessboard" class="board">
+
+    <div id="chessboard" class="board" hx-get="/new_position" hx-trigger="load" hx-swap="innerHTML">
         {% for row in range(8) %}
             <div class="row">
                 {% for col in range(8) %}
-                    <div class="square" id="square-{{ row }}-{{ col }}"></div>
+                    <div class="square" id="{{ 'abcdefgh'[col] + (8 - row)|string }}"></div>
                 {% endfor %}
             </div>
         {% endfor %}

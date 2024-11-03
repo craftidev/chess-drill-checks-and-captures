@@ -1,0 +1,20 @@
+{% for row in range(8) %}
+    <div class="row">
+        {% for col in range(8) %}
+            {% set square_name = square_names[row * 8 + col] %}
+            <div class="square" id="{{ square_name }}">
+                {% if square_name in pieces %}
+                    <img
+                        src="{{ url_for(
+                            'static', filename='assets/chess-pieces/' + pieces[square_name] + '.svg'
+                        )}}"
+                        alt="{{ pieces[square_name] }}"
+                        class="piece"
+                    >
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+
+<script src="/static/script.js"></script>
