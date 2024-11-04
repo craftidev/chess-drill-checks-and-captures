@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="/static/github.com/schaumb/domarrow.js/domarrow.css">
     <script src="/static/htmx.min.js"></script>
     <script src="/static/github.com/schaumb/domarrow.js/domarrow.js"></script>
+    <script src="/static/script.js" defer></script>
 </head>
 
-<body>
+<body hx-on="loadNewPosition: js:clearArrows()">
     <h1>Chess drill: checks &amp; captures</h1>
 
     <div id="instruction">
@@ -28,7 +29,13 @@
     >
 
     <main>
-        <div id="chessboard" class="board" hx-get="/new_position" hx-trigger="load" hx-swap="innerHTML">
+        <div
+            id="chessboard"
+            class="board"
+            hx-get="/new_position"
+            hx-trigger="load, loadNewPosition from:body"
+            hx-swap="innerHTML"
+        >
             {% for row in range(8) %}
                 <div class="row">
                     {% for col in range(8) %}
@@ -45,6 +52,5 @@
     </main>
 
     {% include "partials/submit_button.html" %}
-
 </body>
 </html>
