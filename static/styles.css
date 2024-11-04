@@ -83,3 +83,30 @@ main  {
 .incorrect-message {
     color: red;
 }
+
+.king-button {
+    width: 60px;
+    height: 60px;
+    background-size: cover;
+    background-position: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+
+.king-button[data-player-color="white"] {
+    background-image: url('/static/assets/chess-pieces/wK.svg');
+    color: black;
+}
+
+.king-button[data-player-color="black"] {
+    background-image: url('/static/assets/chess-pieces/bK.svg');
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
