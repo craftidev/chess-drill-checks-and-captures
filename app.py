@@ -1,11 +1,13 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, json, render_template, jsonify, request, session, make_response
 import chess
 
 app = Flask(__name__)
+app.secret_key = b'make_a_secret_key_for_prod_here'
 
 @app.route("/new_position")
 def new_position():
     fen = "4k3/2bppp2/8/8/3PPP2/3N4/3K4/8 w - - 0 1"
+    session["fen"] = fen
     board = chess.Board(fen)
 
     white_to_play = board.turn
@@ -23,27 +25,71 @@ def new_position():
 
     return render_template(
         "partials/board.html",
+        fen = fen,
         pieces = pieces,
         square_names = square_names,
     )
 
+def get_opponent_checks_and_captures(board):
+    board.turn = not board.turn
+    opponent_moves = []
+    for move in board.legal_moves:
+        if board.is_capture(move):
+            opponent_moves.append(move.uci())
+            continue
+        elif board.gives_check(move):
+            opponent_moves.append(move.uci())
+    board.turn = not board.turn
+
+    return opponent_moves
+
 @app.route("/validate_arrows", methods=["POST"])
 def validate_arrows():
-    data = request.json
-    arrows = data.get("arrows", [])
+    data = request.form
+    arrows_json = data.get("arrows")
+    arrows = json.loads(arrows_json) if arrows_json else []
+    print(arrows)
+    fen = session.get("fen")
 
-    response = {
-        "streak_updated": True,
-        "message": "Correct" if True else "Incorrect, try again."
-    }
+    board = chess.Board(fen)
+    required_moves = get_opponent_checks_and_captures(board)
+    is_correct = sorted(required_moves) == sorted(arrows)
 
-    return jsonify(response)
+    streak = int(session.get("streak", 0))
+    if is_correct:
+        streak += 1
+        message = "Correct!"
+        message_class = "correct-message"
+    else:
+        streak = 0
+        message = "Incorrect, try again."
+        message_class = "incorrect-message"
+
+    session["message"] = message
+    session["message_class"] = message_class
+    session["streak"] = streak
+
+    response = make_response("<div>Testing HX-Trigger</div>")
+    response.headers['HX-Trigger'] = 'updateFeedback'
+
+    return response
+
+@app.route("/update_message")
+def update_message():
+    message = session.get("message", "")
+    message_class = session.get("message_class", "")
+    return f'<p id="message" class="{ message_class }">{ message }</p>'
+@app.route("/update_streak")
+def update_streak():
+    streak = session.get("streak", 0)
+    return f'<span id="streak-counter">{ streak }</span>'
 
 @app.route("/")
 def main():
+    streak = session.get("streak", 0)
     return render_template(
         "index.html",
-        streak = 0,
+        streak = streak,
     )
 
 if __name__ == "__main__":
