@@ -58,3 +58,28 @@ h1 {
     pointer-events: none;
     user-select: none;
 }
+
+main  {
+    display: flex;
+    gap: 5rem;
+    align-items: center;
+}
+
+#submit-button {
+    margin-top: 3rem;
+    min-width: 5rem;
+    min-height: 5rem;
+}
+
+.feedback {
+    display: flex;
+    flex-direction: column;
+}
+
+.correct-message {
+    color: green;
+}
+
+.incorrect-message {
+    color: red;
+}
