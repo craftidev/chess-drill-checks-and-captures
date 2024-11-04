@@ -10,27 +10,42 @@
     <script src="/static/github.com/schaumb/domarrow.js/domarrow.js"></script>
 </head>
 
-<body>
+<body hx-trigger="updateFeedback from:body">
     <h1>Chess drill: checks &amp; captures</h1>
 
     <div id="instruction">
         <p>Identify all possible checks and captures from the opponent.</p>
     </div>
 
-    <div id="streak">
-        <p>Current Streak: <span id="streak-counter">{{ streak }}</span></p>
-    </div>
+    <input type="hidden" name="arrows" id="arrows">
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("arrows").value = JSON.stringify([]);
+        });
+    </script>
 
-    <div id="chessboard" class="board" hx-get="/new_position" hx-trigger="load" hx-swap="innerHTML">
-        {% for row in range(8) %}
-            <div class="row">
-                {% for col in range(8) %}
+    <main>
+        <div id="chessboard" class="board" hx-get="/new_position" hx-trigger="load" hx-swap="innerHTML">
+            {% for row in range(8) %}
+                <div class="row">
+                    {% for col in range(8) %}
                     <div class="square" id="{{ 'abcdefgh'[col] + (8 - row)|string }}"></div>
+                    {% endfor %}
+                </div>
                 {% endfor %}
             </div>
-        {% endfor %}
-    </div>
 
-    <button id="submit-button">Submit</button>
+        <div class="feedback">
+            <p>Current Streak: <span id="streak-counter" hx-get="/update_streak" hx-trigger="updateFeedback from:body, load">0</span></p>
+            <p id="message" hx-get="/update_message" hx-trigger="updateFeedback from:body"></p>
+        </div>
+    </main>
+
+    <button
+        id="submit-button"
+        hx-post="/validate_arrows"
+        hx-include="[name='arrows']"
+        hx-swap="none"
+    >Submit</button>
 </body>
 </html>
