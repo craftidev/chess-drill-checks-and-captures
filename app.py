@@ -48,7 +48,6 @@ def validate_arrows():
     data = request.form
     arrows_json = data.get("arrows")
     arrows = json.loads(arrows_json) if arrows_json else []
-    print(arrows)
     fen = session.get("fen")
 
     board = chess.Board(fen)
@@ -69,7 +68,7 @@ def validate_arrows():
     session["message_class"] = message_class
     session["streak"] = streak
 
-    response = make_response("<div>Testing HX-Trigger</div>")
+    response = make_response()
     response.headers['HX-Trigger'] = 'updateFeedback'
 
     return response
@@ -83,6 +82,9 @@ def update_message():
 def update_streak():
     streak = session.get("streak", 0)
     return f'<span id="streak-counter">{ streak }</span>'
+@app.route("/reset_arrows")
+def reset_arrows():
+    return '<input type="hidden" name="arrows" id="arrows">', 200
 
 @app.route("/")
 def main():

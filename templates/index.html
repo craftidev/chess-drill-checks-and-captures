@@ -17,12 +17,12 @@
         <p>Identify all possible checks and captures from the opponent.</p>
     </div>
 
-    <input type="hidden" name="arrows" id="arrows">
-    <script>
+    <input type="hidden" name="arrows" id="arrows" hx-get="/reset_arrows" hx-trigger="load" hx-swap="outerHTML">
+    <!-- <script>
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("arrows").value = JSON.stringify([]);
         });
-    </script>
+    </script> -->
 
     <main>
         <div id="chessboard" class="board" hx-get="/new_position" hx-trigger="load" hx-swap="innerHTML">
@@ -47,5 +47,6 @@
         hx-include="[name='arrows']"
         hx-swap="none"
     >Submit</button>
+
 </body>
 </html>
