@@ -22,9 +22,9 @@ document.querySelectorAll('.square').forEach(square => {
                 arrows.push(startSquare + endSquare);
                 drawArrow(startSquare, endSquare);
             }
+            document.getElementById('arrows').value = JSON.stringify(arrows);
         }
         startSquare = null;
-        console.log(arrows)
     });
 });
 
@@ -37,16 +37,3 @@ function drawArrow(start, end) {
     newArrow.setAttribute("id", "arrow-" + start + end)
     document.body.appendChild(newArrow)
 }
-
-document.getElementById('submit-button').addEventListener('click', function() {
-    fetch('/validate_arrows', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ arrows: arrows })
-    }).then(response => response.json())
-        .then(data => {
-            console.log(data);
-        });
-});
