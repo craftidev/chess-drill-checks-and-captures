@@ -1,12 +1,38 @@
+import random
 from flask import Flask, json, render_template, request, session, make_response
 import chess
+import chess.pgn
 
 app = Flask(__name__)
 app.secret_key = b'make_a_secret_key_for_prod_here'
 
+def select_random_position(pgn_file_path = "static/resources/WorldChamp2023.pgn"):
+    with open(pgn_file_path) as pgn_file:
+        games = list(chess.pgn.read_game(pgn_file) for _ in range(14))
+        random_game = random.choice(games)
+
+    positions = []
+    board = random_game.board()
+    positions.append(board.fen())
+
+    for move in random_game.mainline_moves():
+        board.push(move)
+        positions.append(board.fen())
+
+    nasa = 0
+    while True:
+        nasa += 1
+        random_position_fen = random.choice(positions)
+        board = chess.Board(random_position_fen)
+        board.turn = not board.turn
+        if any(board.legal_moves):
+            return random_position_fen
+        if nasa > 10000:
+            print("LOOP error")
+
 @app.route("/new_position")
 def new_position():
-    fen = "4k3/2bppp2/8/8/3PPP2/3N4/3K4/8 b - - 0 1"
+    fen = select_random_position()
     session["fen"] = fen
     board = chess.Board(fen)
     player_color = "white" if board.turn else "black"
@@ -55,7 +81,6 @@ def get_opponent_checks_and_captures(board):
 
 @app.route("/validate_arrows", methods=["POST"])
 def validate_arrows():
-    print("Form data:", request.form)
     arrows = json.loads(request.form.get("arrows", "[]"))
     fen = session.get("fen")
     board = chess.Board(fen)
@@ -73,7 +98,10 @@ def validate_arrows():
     })
 
     response = make_response()
-    response.headers['HX-Trigger'] = 'updateFeedback, resetArrows'
+    if is_correct:
+        response.headers['HX-Trigger'] = 'updateFeedback, resetArrows, loadNewPosition'
+    else:
+        response.headers['HX-Trigger'] = 'updateFeedback, resetArrows'
     return response
 
 @app.route("/update_message")
